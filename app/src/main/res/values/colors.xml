@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AMLEDS 1995 Soda Fountain Neon Palace Theme -->
+    <color name="backgroundColor">#0a0a1a</color>
+    <color name="surfaceColor">#1a1a2a</color>
+    <color name="amberColor">#00BFFF</color>
+    <color name="amberDim">#4169E1</color>
+    <color name="amberBright">#00FFFF</color>
+    
+    <!-- Vitals Status Colors -->
+    <color name="vitalsStable">#00FFFF</color>
+    <color name="vitalsCaution">#FF1493</color>
+    <color name="vitalsCritical">#9370DB</color>
+    <color name="vitalsFlatline">#555577</color>
+</resources>

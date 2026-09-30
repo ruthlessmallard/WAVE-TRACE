@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundColor"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="WAVE TRACE"
+        android:textColor="@color/amberColor"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:letterSpacing="4"
+        android:gravity="center"
+        android:paddingBottom="8dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/amberDim"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Main Signal Display -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/vitals_card"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/ssidText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SCANNING..."
+            android:textColor="@color/amberColor"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/rssiText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-- dBm"
+            android:textColor="@color/vitalsStable"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INITIALIZING..."
+            android:textColor="@color/amberDim"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="2"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Signal Graph -->
+    <com.ruthlessmallard.wavetrace.SignalGraphView
+        android:id="@+id/signalGraph"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/vitals_card"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Details Grid -->
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:background="@drawable/vitals_card"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="BSSID"
+            android:textColor="@color/amberDim"
+            android:textSize="12sp"
+            android:letterSpacing="1" />
+
+        <TextView
+            android:id="@+id/bssidText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="--"
+            android:textColor="@color/amberColor"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:gravity="end" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="FREQUENCY"
+            android:textColor="@color/amberDim"
+            android:textSize="12sp"
+            android:letterSpacing="1"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/frequencyText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="-- MHz"
+            android:textColor="@color/amberColor"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:gravity="end"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="LINK SPEED"
+            android:textColor="@color/amberDim"
+            android:textSize="12sp"
+            android:letterSpacing="1"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/linkSpeedText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="-- Mbps"
+            android:textColor="@color/amberColor"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:gravity="end"
+            android:layout_marginTop="8dp" />
+
+    </GridLayout>
+
+</LinearLayout>

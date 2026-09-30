@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.WaveTrace" parent="Theme.MaterialComponents.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="android:statusBarColor">@color/backgroundColor</item>
+        <item name="android:navigationBarColor">@color/backgroundColor</item>
+        <item name="colorPrimary">@color/amberColor</item>
+        <item name="colorPrimaryVariant">@color/amberDim</item>
+        <item name="colorOnPrimary">@color/backgroundColor</item>
+        <item name="colorSecondary">@color/amberBright</item>
+        <item name="colorSurface">@color/surfaceColor</item>
+        <item name="colorOnSurface">@color/amberColor</item>
+    </style>
+</resources>
