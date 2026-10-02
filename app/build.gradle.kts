@@ -20,6 +20,12 @@ android {
         buildConfig = true
     }
 
+    sourceSets {
+        main {
+            manifest.srcFile("src/main/AndroidManifest.xml")
+        }
+    }
+
     buildTypes {
         release {
             isAab = false
