@@ -27,6 +27,12 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleRelease --no-daemon --info --stacktrace
     
+    - name: Get Merged Manifest
+      run: |
+        ./gradlew processReleaseMainManifest --debug
+        find app/build/intermediates/merged_manifests/release/ -name "AndroidManifest.xml" -exec cat {} \;
+      continue-on-error: true
+    
     - name: List APK output directory
       run: ls -lR app/build/outputs/apk/release/
       continue-on-error: true
