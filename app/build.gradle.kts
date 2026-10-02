@@ -15,8 +15,14 @@ android {
         versionName = "1.0"
     }
 
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+
     buildTypes {
         release {
+            isAab = false
             signingConfig signingConfigs.debug
             isMinifyEnabled = false
             proguardFiles(
