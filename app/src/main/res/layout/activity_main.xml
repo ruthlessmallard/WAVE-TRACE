@@ -9,16 +9,37 @@
     tools:context=".MainActivity">
 
     <!-- Header -->
-    <TextView
+    <!-- Header -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="WAVE TRACE"
-        android:textColor="@color/amberColor"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:letterSpacing="4"
-        android:gravity="center"
-        android:paddingBottom="8dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="WAVE TRACE"
+            android:textColor="@color/amberColor"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:letterSpacing="4"
+            android:gravity="center_vertical"
+             />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_settings_amber_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Settings"
+            android:padding="8dp"
+            />
+
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
@@ -26,66 +47,88 @@
         android:background="@color/amberDim"
         android:layout_marginBottom="16dp" />
 
-    <!-- Main Signal Display -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/vitals_card"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp">
-
-        <TextView
-            android:id="@+id/ssidText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SCANNING..."
-            android:textColor="@color/amberColor"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/rssiText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="-- dBm"
-            android:textColor="@color/vitalsStable"
-            android:textSize="48sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"
-            android:gravity="center"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="INITIALIZING..."
-            android:textColor="@color/amberDim"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:letterSpacing="2"
-            android:gravity="center" />
-    </LinearLayout>
-
-    <!-- Signal Graph -->
-    <com.ruthlessmallard.wavetrace.SignalGraphView
-        android:id="@+id/signalGraph"
+    <!-- Network List View (initially hidden) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/networkRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/vitals_card"
+        android:visibility="gone"
         android:layout_marginBottom="16dp" />
+
+    <!-- Main Content (Signal Display and Graph) -->
+    <LinearLayout
+        android:id="@+id/mainContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <!-- Current Network Display -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/vitals_card"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/ssidText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SCANNING..."
+                android:textColor="@color/amberColor"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/rssiText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="-- dBm"
+                android:textColor="@color/vitalsStable"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="INITIALIZING..."
+                android:textColor="@color/amberDim"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="2"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- Signal Graph -->
+        <com.ruthlessmallard.wavetrace.SignalGraphView
+            android:id="@+id/signalGraph"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/vitals_card"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
 
     <!-- Details Grid -->
     <GridLayout
+        android:id="@+id/detailsGridLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
         android:background="@drawable/vitals_card"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="visible">
 
         <TextView
             android:layout_width="0dp"

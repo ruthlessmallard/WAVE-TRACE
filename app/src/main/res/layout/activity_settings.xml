@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundColor"
+    android:padding="16dp"
+    tools:context=".SettingsActivity">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SETTINGS"
+        android:textColor="@color/amberColor"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:letterSpacing="4"
+        android:gravity="center"
+        android:paddingBottom="8dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/amberDim"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Scan Frequency Setting -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan Frequency (seconds)"
+        android:textColor="@color/amberColor"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/scanFrequencyEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="e.g., 5 (seconds)"
+        android:textColor="@color/amberBright"
+        android:textColorHint="@color/amberDim"
+        android:backgroundTint="@color/amberDim"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- DBI Calibration Setting -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DBI Calibration Offset"
+        android:textColor="@color/amberColor"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/dbiCalibrationEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned"
+        android:hint="e.g., -5 or +5"
+        android:textColor="@color/amberBright"
+        android:textColorHint="@color/amberDim"
+        android:backgroundTint="@color/amberDim"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/saveSettingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SAVE SETTINGS"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/amberColor"
+        android:textColor="@color/backgroundColor"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+</LinearLayout>
