@@ -45,7 +45,7 @@ cd "$APP_HOME"
 
 # Add default JVM options for the Gradle daemon.
 # You can change these options by setting the JAVA_OPTS environment variable.
-DEFAULT_JVM_OPTS='"-Xmx1024m" "-Dfile.encoding=UTF-8"'
+DEFAULT_JVM_OPTS="-Xmx1024m -Dfile.encoding=UTF-8"
 
 # Make the wrapper JAR and other necessary tools available.
 if [ -e "gradle/wrapper/gradle-wrapper.jar" ]; then
@@ -55,4 +55,5 @@ else
     exit 1
 fi
 
-# Execute Gradle, with the wrapper JAR."$JAVACMD" $JAVA_OPTS $DEFAULT_JVM_OPTS -cp "$APP_HOME/$GRADLE_JAR" org.gradle.wrapper.GradleWrapperMain "$@"
+# Execute Gradle, with the wrapper JAR.
+"$JAVACMD" $JAVA_OPTS $DEFAULT_JVM_OPTS -cp "$APP_HOME/$GRADLE_JAR" org.gradle.wrapper.GradleWrapperMain "$@"

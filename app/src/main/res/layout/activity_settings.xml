@@ -16,7 +16,7 @@
         android:textColor="@color/amberColor"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:letterSpacing="4"
+        android:letterSpacing="0.2"
         android:gravity="center"
         android:paddingBottom="8dp" />
 

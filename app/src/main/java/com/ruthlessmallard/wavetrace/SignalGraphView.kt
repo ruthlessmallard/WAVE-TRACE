@@ -54,6 +54,11 @@ class SignalGraphView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun clearReadings() {
+        readings.clear()
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 

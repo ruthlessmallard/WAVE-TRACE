@@ -1,3 +1,48 @@
+package com.ruthlessmallard.wavetrace
+
+import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.net.wifi.ScanResult
+import android.net.wifi.WifiManager
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var wifiManager: WifiManager
+    private lateinit var signalGraph: SignalGraphView
+    private lateinit var ssidText: TextView
+    private lateinit var rssiText: TextView
+    private lateinit var bssidText: TextView
+    private lateinit var frequencyText: TextView
+    private lateinit var linkSpeedText: TextView
+    private lateinit var statusText: TextView
+
+    private lateinit var networkRecyclerView: RecyclerView
+    private lateinit var settingsButton: ImageButton
+    private lateinit var mainContentLayout: View
+    private lateinit var detailsGridLayout: View
+    private lateinit var networkAdapter: NetworkAdapter
+
+    private val availableNetworks = mutableListOf<ScanResult>()
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val updateInterval = 1000L // 1 second
+    private val scanInterval = 5000L   // 5 seconds between Wi-Fi scans
+
     private val updateRunnable = object : Runnable {
         override fun run() {
             updateWifiInfo()
