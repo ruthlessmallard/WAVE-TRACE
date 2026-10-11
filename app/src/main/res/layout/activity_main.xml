@@ -25,7 +25,8 @@
             android:textColor="@color/amberColor"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:letterSpacing="4"
+            android:letterSpacing="0.2"
+            android:maxLines="1"
             android:gravity="center_vertical"
              />
 
@@ -105,7 +106,8 @@
                 android:textColor="@color/amberDim"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:letterSpacing="2"
+                android:letterSpacing="0.1"
+                android:maxLines="1"
                 android:gravity="center" />
         </LinearLayout>
 
@@ -137,7 +139,7 @@
             android:text="BSSID"
             android:textColor="@color/amberDim"
             android:textSize="12sp"
-            android:letterSpacing="1" />
+            android:letterSpacing="0.05" />
 
         <TextView
             android:id="@+id/bssidText"
@@ -157,7 +159,7 @@
             android:text="FREQUENCY"
             android:textColor="@color/amberDim"
             android:textSize="12sp"
-            android:letterSpacing="1"
+            android:letterSpacing="0.05"
             android:layout_marginTop="8dp" />
 
         <TextView
@@ -179,7 +181,7 @@
             android:text="LINK SPEED"
             android:textColor="@color/amberDim"
             android:textSize="12sp"
-            android:letterSpacing="1"
+            android:letterSpacing="0.05"
             android:layout_marginTop="8dp" />
 
         <TextView
