@@ -20,12 +20,6 @@ android {
         buildConfig = true
     }
 
-    sourceSets {
-        main {
-            manifest.srcFile("src/main/AndroidManifest.xml")
-        }
-    }
-
     buildTypes {
         release {
             // Sign the release APK with the auto-generated debug keystore so it
