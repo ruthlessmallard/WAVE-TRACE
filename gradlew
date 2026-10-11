@@ -55,4 +55,5 @@ else
     exit 1
 fi
 
-# Execute Gradle, with the wrapper JAR."$JAVACMD" $JAVA_OPTS $DEFAULT_JVM_OPTS -cp "$APP_HOME/$GRADLE_JAR" org.gradle.wrapper.GradleWrapperMain "$@"
+# Execute Gradle, with the wrapper JAR.
+"$JAVACMD" $JAVA_OPTS $DEFAULT_JVM_OPTS -cp "$APP_HOME/$GRADLE_JAR" org.gradle.wrapper.GradleWrapperMain "$@"
