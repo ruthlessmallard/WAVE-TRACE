@@ -169,17 +169,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Android 13+ scans Wi-Fi via NEARBY_WIFI_DEVICES; older releases use
-     * ACCESS_FINE_LOCATION. Returns whichever this device actually needs.
+     * Wi-Fi scanning needs ACCESS_FINE_LOCATION on every version, plus
+     * NEARBY_WIFI_DEVICES at runtime on Android 13+. Requesting only
+     * NEARBY_WIFI_DEVICES (without the neverForLocation flag) yields EMPTY
+     * scan results — the bug that broke the first polish build.
      */
-    private fun scanPermission(): String =
+    private fun scanPermissions(): Array<String> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            Manifest.permission.NEARBY_WIFI_DEVICES
+            arrayOf(
+                Manifest.permission.NEARBY_WIFI_DEVICES,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
         else
-            Manifest.permission.ACCESS_FINE_LOCATION
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    private fun hasScanPermission(): Boolean =
+        scanPermissions().all {
+            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+        }
 
     private fun startWifiScan() {
-        if (ContextCompat.checkSelfPermission(this, scanPermission()) == PackageManager.PERMISSION_GRANTED) {
+        if (hasScanPermission()) {
             wifiManager.startScan()
             handler.postDelayed(scanRunnable, scanIntervalMs)
         } else {
@@ -196,11 +206,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateNetworkList() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                scanPermission()
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (!hasScanPermission()) {
             // Permissions are not granted, handle this case (should be caught by checkPermissions)
             return
         }
@@ -212,8 +218,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        val requiredPermissions = arrayOf(
-            scanPermission(),
+        val requiredPermissions = scanPermissions() + arrayOf(
             Manifest.permission.ACCESS_WIFI_STATE, // For general Wi-Fi state access
             Manifest.permission.CHANGE_WIFI_STATE // For initiating scans
         )
@@ -240,7 +245,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
-            if (ContextCompat.checkSelfPermission(this, scanPermission()) == PackageManager.PERMISSION_GRANTED) {
+            if (hasScanPermission()) {
                 statusText.text = "SCANNING..."
                 statusText.setTextColor(getColor(R.color.vitalsStable))
                 if (isShowingNetworkList) {
