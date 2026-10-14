@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -36,12 +37,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainContentLayout: View
     private lateinit var detailsGridLayout: View
     private lateinit var networkAdapter: NetworkAdapter
+    private lateinit var scanButton: ImageButton
 
     private val availableNetworks = mutableListOf<ScanResult>()
 
     private val handler = Handler(Looper.getMainLooper())
     private val updateInterval = 1000L // 1 second
-    private val scanInterval = 5000L   // 5 seconds between Wi-Fi scans
+
+    // User-configurable via the Settings screen; reloaded on every resume
+    private val prefs by lazy { getSharedPreferences("WaveTraceSettings", Context.MODE_PRIVATE) }
+    private var scanIntervalMs = 5000L        // scanFrequency (seconds) * 1000
+    private var dbiCalibration = 0            // offset added to every displayed reading
 
     private val updateRunnable = object : Runnable {
         override fun run() {
@@ -82,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize new UI elements
         networkRecyclerView = findViewById(R.id.networkRecyclerView)
         settingsButton = findViewById(R.id.settingsButton)
+        scanButton = findViewById(R.id.scanButton)
         mainContentLayout = findViewById(R.id.mainContentLayout)
         detailsGridLayout = findViewById(R.id.detailsGridLayout)
 
@@ -92,8 +99,11 @@ class MainActivity : AppCompatActivity() {
         networkRecyclerView.layoutManager = LinearLayoutManager(this)
         networkRecyclerView.adapter = networkAdapter
 
-        settingsButton.setOnClickListener { 
+        scanButton.setOnClickListener {
             toggleNetworkListView(!isShowingNetworkList)
+        }
+        settingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         checkPermissions()
@@ -106,6 +116,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        reloadSettings()
         handler.post(updateRunnable)
         // Start continuous scanning when the app is active and list is visible
         if (isShowingNetworkList) {
@@ -133,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             networkRecyclerView.visibility = View.VISIBLE
             startWifiScan()
             statusText.text = "SELECT NETWORK..."
-            statusText.setTextColor(getColor(R.color.amberColor))
+            statusText.setTextColor(getColor(R.color.accentColor))
         } else {
             networkRecyclerView.visibility = View.GONE
             mainContentLayout.visibility = View.VISIBLE
@@ -149,18 +160,32 @@ class MainActivity : AppCompatActivity() {
         toggleNetworkListView(false) // Switch back to main view
         signalGraph.clearReadings() // Clear graph for new network
         statusText.text = "MONITORING ${selectedNetwork?.SSID}"
-        statusText.setTextColor(getColor(R.color.amberColor))
+        statusText.setTextColor(getColor(R.color.accentColor))
     }
 
+    private fun reloadSettings() {
+        scanIntervalMs = prefs.getInt("scanFrequency", 5).coerceAtLeast(1) * 1000L
+        dbiCalibration = prefs.getInt("dbiCalibration", 0)
+    }
+
+    /**
+     * Android 13+ scans Wi-Fi via NEARBY_WIFI_DEVICES; older releases use
+     * ACCESS_FINE_LOCATION. Returns whichever this device actually needs.
+     */
+    private fun scanPermission(): String =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            Manifest.permission.NEARBY_WIFI_DEVICES
+        else
+            Manifest.permission.ACCESS_FINE_LOCATION
+
     private fun startWifiScan() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, scanPermission()) == PackageManager.PERMISSION_GRANTED) {
             wifiManager.startScan()
-            handler.postDelayed(scanRunnable, scanInterval)
+            handler.postDelayed(scanRunnable, scanIntervalMs)
         } else {
             // Permissions not granted, cannot scan
-            statusText.text = "LOCATION PERMISSION REQUIRED FOR SCAN"
+            statusText.text = "SCAN PERMISSION REQUIRED"
             statusText.setTextColor(getColor(R.color.vitalsCritical))
-            // Optionally, request permissions again or show a message
         }
     }
 
@@ -173,7 +198,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateNetworkList() {
         if (ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                scanPermission()
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             // Permissions are not granted, handle this case (should be caught by checkPermissions)
@@ -188,7 +213,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkPermissions() {
         val requiredPermissions = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
+            scanPermission(),
             Manifest.permission.ACCESS_WIFI_STATE, // For general Wi-Fi state access
             Manifest.permission.CHANGE_WIFI_STATE // For initiating scans
         )
@@ -215,14 +240,14 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
-            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+            if (ContextCompat.checkSelfPermission(this, scanPermission()) == PackageManager.PERMISSION_GRANTED) {
                 statusText.text = "SCANNING..."
                 statusText.setTextColor(getColor(R.color.vitalsStable))
                 if (isShowingNetworkList) {
                     startWifiScan()
                 }
             } else {
-                statusText.text = "ALL REQUIRED PERMISSIONS NOT GRANTED"
+                statusText.text = "SCAN PERMISSION NOT GRANTED"
                 statusText.setTextColor(getColor(R.color.vitalsCritical))
             }
         }
@@ -232,7 +257,7 @@ class MainActivity : AppCompatActivity() {
         try {
             // Only update connected info if not showing the network list
             if (!isShowingNetworkList) {
-                val currentRssi: Int
+                val rawRssi: Int?
                 val currentSsid: String
                 val currentBssid: String
                 val currentFrequency: Int
@@ -242,61 +267,78 @@ class MainActivity : AppCompatActivity() {
                     // Monitor the selected network
                     val scanResult = availableNetworks.find { it.BSSID == selectedNetwork?.BSSID }
                     if (scanResult != null) {
-                        currentRssi = scanResult.level
+                        rawRssi = scanResult.level
                         currentSsid = scanResult.SSID
                         currentBssid = scanResult.BSSID
                         currentFrequency = scanResult.frequency
                         currentLinkSpeed = -1 // ScanResult doesn't have link speed
                     } else {
-                        // Selected network not found in current scan results
-                        // This implies the network might have disappeared or moved
-                        currentRssi = 0 // Indicate no signal or lost
+                        // Selected network dropped out of the scan window
+                        rawRssi = null
                         currentSsid = selectedNetwork?.SSID ?: "Lost Network"
                         currentBssid = selectedNetwork?.BSSID ?: "Unknown"
                         currentFrequency = 0
                         currentLinkSpeed = -1
-                        statusText.text = "LOST ${currentSsid}"
-                        statusText.setTextColor(getColor(R.color.vitalsCritical))
                         // Re-initiate scan to find it again
                         startWifiScan()
                     }
                 } else {
-                    // Default to connected network if no specific network is selected
+                    // Fall back to the currently-connected AP
                     val connectionInfo = wifiManager.connectionInfo
-                    currentRssi = connectionInfo.rssi
-                    currentSsid = connectionInfo.ssid?.replace("\"", "") ?: "Unknown"
-                    currentBssid = connectionInfo.bssid ?: "Unknown"
-                    currentFrequency = connectionInfo.frequency
-                    currentLinkSpeed = connectionInfo.linkSpeed
+                    val ssid = connectionInfo.ssid?.replace("\"", "")
+                    if (ssid.isNullOrBlank() || ssid == "<unknown ssid>" || connectionInfo.networkId == -1) {
+                        rawRssi = null
+                        currentSsid = "NO NETWORK SELECTED"
+                        currentBssid = "Unknown"
+                        currentFrequency = 0
+                        currentLinkSpeed = -1
+                    } else {
+                        rawRssi = connectionInfo.rssi
+                        currentSsid = ssid
+                        currentBssid = connectionInfo.bssid ?: "Unknown"
+                        currentFrequency = connectionInfo.frequency
+                        currentLinkSpeed = connectionInfo.linkSpeed
+                    }
                 }
 
                 ssidText.text = currentSsid
-                rssiText.text = "${currentRssi} dBm"
-                bssidText.text = currentBssid.uppercase()
-                frequencyText.text = "${currentFrequency} MHz"
-                linkSpeedText.text = "${if (currentLinkSpeed != -1) "${currentLinkSpeed} Mbps" else "--"}"
+                bssidText.text = if (currentBssid.isBlank() || currentBssid == "Unknown") "--" else currentBssid.uppercase()
+                frequencyText.text = if (currentFrequency > 0) "${currentFrequency} MHz" else "-- MHz"
+                linkSpeedText.text = if (currentLinkSpeed > 0) "${currentLinkSpeed} Mbps" else "-- Mbps"
 
-                // Add to graph
-                signalGraph.addReading(currentRssi.toFloat())
+                if (rawRssi == null) {
+                    // No reading to report — don't invent one
+                    rssiText.text = "-- dBm"
+                    rssiText.setTextColor(getColor(R.color.vitalsFlatline))
+                    statusText.text = if (selectedNetwork != null) "LOST ${currentSsid}"
+                                       else "TAP THE SCAN ICON TO MONITOR A NETWORK"
+                    statusText.setTextColor(getColor(R.color.vitalsCritical))
+                    return
+                }
+
+                // Apply the user's calibration offset, then display and plot it
+                val calibratedRssi = rawRssi + dbiCalibration
+                rssiText.text = "${calibratedRssi} dBm"
+                signalGraph.addReading(calibratedRssi.toFloat())
 
                 // Status color based on signal strength
                 when {
-                    currentRssi >= -50 -> {
+                    calibratedRssi >= -50 -> {
                         statusText.text = "SIGNAL EXCELLENT"
                         statusText.setTextColor(getColor(R.color.vitalsStable))
                         rssiText.setTextColor(getColor(R.color.vitalsStable))
                     }
-                    currentRssi >= -65 -> {
+                    calibratedRssi >= -65 -> {
                         statusText.text = "SIGNAL GOOD"
                         statusText.setTextColor(getColor(R.color.vitalsStable))
                         rssiText.setTextColor(getColor(R.color.vitalsStable))
                     }
-                    currentRssi >= -75 -> {
+                    calibratedRssi >= -75 -> {
                         statusText.text = "SIGNAL FAIR"
                         statusText.setTextColor(getColor(R.color.vitalsCaution))
                         rssiText.setTextColor(getColor(R.color.vitalsCaution))
                     }
-                    currentRssi >= -85 -> {
+                    calibratedRssi >= -85 -> {
                         statusText.text = "SIGNAL POOR"
                         statusText.setTextColor(getColor(R.color.vitalsCritical))
                         rssiText.setTextColor(getColor(R.color.vitalsCritical))

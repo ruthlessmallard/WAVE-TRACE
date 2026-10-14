@@ -9,7 +9,6 @@
     tools:context=".MainActivity">
 
     <!-- Header -->
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,13 +21,23 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="WAVE TRACE"
-            android:textColor="@color/amberColor"
+            android:textColor="@color/accentColor"
             android:textSize="24sp"
             android:textStyle="bold"
             android:letterSpacing="0.2"
             android:maxLines="1"
             android:gravity="center_vertical"
              />
+
+        <ImageButton
+            android:id="@+id/scanButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_scan_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Scan and select a network"
+            android:padding="8dp"
+            />
 
         <ImageButton
             android:id="@+id/settingsButton"
@@ -45,7 +54,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/amberDim"
+        android:background="@color/accentDim"
         android:layout_marginBottom="16dp" />
 
     <!-- Network List View (initially hidden) -->
@@ -80,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="SCANNING..."
-                android:textColor="@color/amberColor"
+                android:textColor="@color/accentColor"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -103,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="INITIALIZING..."
-                android:textColor="@color/amberDim"
+                android:textColor="@color/accentDim"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
@@ -137,7 +146,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="BSSID"
-            android:textColor="@color/amberDim"
+            android:textColor="@color/accentDim"
             android:textSize="12sp"
             android:letterSpacing="0.05" />
 
@@ -147,7 +156,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="--"
-            android:textColor="@color/amberColor"
+            android:textColor="@color/accentColor"
             android:textSize="12sp"
             android:fontFamily="monospace"
             android:gravity="end" />
@@ -157,7 +166,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="FREQUENCY"
-            android:textColor="@color/amberDim"
+            android:textColor="@color/accentDim"
             android:textSize="12sp"
             android:letterSpacing="0.05"
             android:layout_marginTop="8dp" />
@@ -168,7 +177,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="-- MHz"
-            android:textColor="@color/amberColor"
+            android:textColor="@color/accentColor"
             android:textSize="12sp"
             android:fontFamily="monospace"
             android:gravity="end"
@@ -179,7 +188,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="LINK SPEED"
-            android:textColor="@color/amberDim"
+            android:textColor="@color/accentDim"
             android:textSize="12sp"
             android:letterSpacing="0.05"
             android:layout_marginTop="8dp" />
@@ -190,7 +199,7 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:text="-- Mbps"
-            android:textColor="@color/amberColor"
+            android:textColor="@color/accentColor"
             android:textSize="12sp"
             android:fontFamily="monospace"
             android:gravity="end"

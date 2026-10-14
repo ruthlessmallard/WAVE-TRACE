@@ -13,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="@color/amberColor"
+        android:textColor="@color/accentColor"
         android:textSize="16sp"
         android:textStyle="bold"
         android:text="Network Name" />
