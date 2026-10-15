@@ -5,30 +5,30 @@ import android.media.AudioFormat
 import android.media.AudioTrack
 
 /**
- * Short rising / falling chirps that report a meaningful change in signal.
+ * Short, LOUD percussive clicks that report a change in signal.
  *
- * Rising  = signal got stronger (RSSI moved toward 0 dBm).
- * Falling = signal got weaker.
+ * Rising = signal got stronger (RSSI moved toward 0 dBm); falling = weaker.
  *
- * Implemented as pure PCM sine sweeps via [AudioTrack] — no bundled assets and
- * no third-party dependencies. Both chirps are synthesised once, kept in static
- * mode, and replayed cheaply on demand.
+ * A pure short sine reads as a faint tick, so each click is a broadband
+ * transient — a pitched sweep (carries the up/down cue) plus a short noise
+ * burst (the audible "clack") — synthesised once in static mode and replayed
+ * cheaply on demand. No bundled assets, no third-party dependencies.
  *
  * WAVE-TRACE is not a safety device; this is a convenience cue only.
  */
-class ToneFeedback(private val volume: Float = 0.5f) {
+class ToneFeedback(private val volume: Float = 0.8f) {
 
     private val sampleRate = 44100
     private var risingTrack: AudioTrack? = null
     private var fallingTrack: AudioTrack? = null
 
     fun rising() {
-        if (risingTrack == null) risingTrack = buildChirp(from = 1000.0, to = 1600.0)
+        if (risingTrack == null) risingTrack = buildClick(from = 1000.0, to = 1650.0)
         play(risingTrack)
     }
 
     fun falling() {
-        if (fallingTrack == null) fallingTrack = buildChirp(from = 1600.0, to = 1000.0)
+        if (fallingTrack == null) fallingTrack = buildClick(from = 1650.0, to = 900.0)
         play(fallingTrack)
     }
 
@@ -44,24 +44,25 @@ class ToneFeedback(private val volume: Float = 0.5f) {
     }
 
     /**
-     * Short percussive CLICK, not a whoop. A click is a transient: brief,
-     * sharp attack, fast decay. Rising/falling character comes from a fast
-     * pitch sweep across the few milliseconds it lasts.
+     * ~40 ms click: fast pitch sweep (up vs down) mixed with a decaying noise
+     * burst. Sharp ~1.5 ms attack, ~10 ms exponential tail.
      */
-    private fun buildChirp(from: Double, to: Double, durationMs: Int = 18): AudioTrack {
+    private fun buildClick(from: Double, to: Double, durationMs: Int = 40): AudioTrack {
         val n = sampleRate * durationMs / 1000
         val samples = ShortArray(n)
+        val decay = sampleRate * 0.010   // ~10 ms tail
+        val attackSamples = (sampleRate * 0.0015).toInt() // ~1.5 ms
         var phase = 0.0
-        val decaySamples = sampleRate * 0.004 // ~4 ms exponential tail
         for (i in 0 until n) {
             val frac = i.toDouble() / n
             val freq = from + (to - from) * frac
             phase += 2.0 * Math.PI * freq / sampleRate
-            // 1 ms attack ramp (no DC pop) x exponential decay (transient snap)
-            val attack = (i / (sampleRate * 0.001)).coerceAtMost(1.0)
-            val decay = Math.exp(-i / decaySamples)
-            samples[i] = (Math.sin(phase) * attack * decay * volume * Short.MAX_VALUE)
-                .toInt().toShort()
+            val noise = (Math.random() * 2.0 - 1.0) // -1..1 broadband "clack"
+            val env = Math.exp(-i / decay)
+            val attack = (i / attackSamples).coerceIn(0.0, 1.0)
+            val tone = Math.sin(phase) * 0.6 + noise * 0.45
+            samples[i] = (tone * env * attack * volume * Short.MAX_VALUE)
+                .toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
         }
 
         val track = AudioTrack.Builder()
