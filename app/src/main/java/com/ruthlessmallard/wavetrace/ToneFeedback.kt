@@ -59,7 +59,7 @@ class ToneFeedback(private val volume: Float = 0.8f) {
             phase += 2.0 * Math.PI * freq / sampleRate
             val noise = (Math.random() * 2.0 - 1.0) // -1..1 broadband "clack"
             val env = Math.exp(-i / decay)
-            val attack = (i / attackSamples).coerceIn(0.0, 1.0)
+            val attack = (i.toDouble() / attackSamples).coerceIn(0.0, 1.0)
             val tone = Math.sin(phase) * 0.6 + noise * 0.45
             samples[i] = (tone * env * attack * volume * Short.MAX_VALUE)
                 .toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
