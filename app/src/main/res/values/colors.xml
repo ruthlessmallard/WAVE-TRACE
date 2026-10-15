@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- WAVE-TRACE scope palette (cyan/blue neon) -->
-    <color name="backgroundColor">#0a0a1a</color>
-    <color name="surfaceColor">#1a1a2a</color>
-    <color name="accentColor">#00BFFF</color>
-    <color name="accentDim">#4169E1</color>
-    <color name="accentBright">#00FFFF</color>
-    
+    <!-- WAVE-TRACE palette: "Democratic '95 soda fountain"
+         Charcoal ground, electric-blue primary, buttery-gold secondary,
+         cream highlight; cherry reserved for critical states. -->
+    <color name="backgroundColor">#0E0E12</color>
+    <color name="surfaceColor">#1B1C23</color>
+    <color name="accentColor">#6D8BF0</color>
+    <color name="accentDim">#3A4E8C</color>
+    <color name="accentBright">#E9E6DA</color>
+    <color name="accentGold">#E6C64F</color>
+
     <!-- Vitals Status Colors -->
-    <color name="vitalsStable">#00FFFF</color>
-    <color name="vitalsCaution">#FF1493</color>
-    <color name="vitalsCritical">#9370DB</color>
-    <color name="vitalsFlatline">#555577</color>
+    <color name="vitalsStable">#6D8BF0</color>
+    <color name="vitalsCaution">#E6C64F</color>
+    <color name="vitalsCritical">#E5534B</color>
+    <color name="vitalsFlatline">#55575E</color>
 </resources>

@@ -68,6 +68,44 @@
         android:padding="8dp"
         android:layout_marginBottom="16dp" />
 
+    <!-- Tone Feedback Toggle -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tone Feedback"
+        android:textColor="@color/accentColor"
+        android:textSize="18sp"
+        android:layout_marginBottom="4dp" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/toneFeedbackSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rising/falling chirp on signal change"
+        android:textColor="@color/accentColor"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Tone Threshold Setting -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tone Threshold (dBm change)"
+        android:textColor="@color/accentColor"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/toneThresholdEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="e.g., 5 (dBm)"
+        android:textColor="@color/accentBright"
+        android:textColorHint="@color/accentDim"
+        android:backgroundTint="@color/accentDim"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp" />
+
     <!-- Save Button -->
     <Button
         android:id="@+id/saveSettingsButton"

@@ -49,6 +49,13 @@ class MainActivity : AppCompatActivity() {
     private var scanIntervalMs = 5000L        // scanFrequency (seconds) * 1000
     private var dbiCalibration = 0            // offset added to every displayed reading
 
+    // Tone feedback: a rising/falling chirp when RSSI moves beyond a threshold
+    private var toneEnabled = true
+    private var toneThresholdDb = 5
+    private var lastToneReading: Float? = null
+    private var lastToneTimeMs = 0L
+    private val toneFeedback by lazy { ToneFeedback() }
+
     private val updateRunnable = object : Runnable {
         override fun run() {
             updateWifiInfo()
@@ -134,6 +141,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(wifiScanReceiver)
+        toneFeedback.release()
     }
 
     private fun toggleNetworkListView(showList: Boolean) {
@@ -166,6 +174,10 @@ class MainActivity : AppCompatActivity() {
     private fun reloadSettings() {
         scanIntervalMs = prefs.getInt("scanFrequency", 5).coerceAtLeast(1) * 1000L
         dbiCalibration = prefs.getInt("dbiCalibration", 0)
+        toneEnabled = prefs.getBoolean("toneFeedbackEnabled", true)
+        toneThresholdDb = prefs.getInt("toneThresholdDb", 5).coerceAtLeast(1)
+        // Reset the baseline so returning from Settings can't fire a stale cue
+        lastToneReading = null
     }
 
     /**
@@ -313,6 +325,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (rawRssi == null) {
                     // No reading to report — don't invent one
+                    lastToneReading = null
                     rssiText.text = "-- dBm"
                     rssiText.setTextColor(getColor(R.color.vitalsFlatline))
                     statusText.text = if (selectedNetwork != null) "LOST ${currentSsid}"
@@ -325,6 +338,7 @@ class MainActivity : AppCompatActivity() {
                 val calibratedRssi = rawRssi + dbiCalibration
                 rssiText.text = "${calibratedRssi} dBm"
                 signalGraph.addReading(calibratedRssi.toFloat())
+                maybeTone(calibratedRssi.toFloat())
 
                 // Status color based on signal strength
                 when {
@@ -361,7 +375,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Play a rising cue when the reading climbs past the threshold and a
+     * falling cue when it drops past it. The threshold is a dB delta, not a
+     * percentage: RSSI is logarithmic, so a percent of a negative dBm value is
+     * meaningless. A minimum gap between cues stops a drifting signal from
+     * machine-gunning the speaker.
+     */
+    private fun maybeTone(reading: Float) {
+        val previous = lastToneReading
+        lastToneReading = reading
+        if (!toneEnabled || previous == null) return
+
+        val delta = reading - previous
+        if (Math.abs(delta) < toneThresholdDb) return
+
+        val now = System.currentTimeMillis()
+        if (now - lastToneTimeMs < MIN_TONE_GAP_MS) return
+        lastToneTimeMs = now
+
+        if (delta > 0) toneFeedback.rising() else toneFeedback.falling()
+    }
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST = 1001
+        private const val MIN_TONE_GAP_MS = 1200L
     }
 }
