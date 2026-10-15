@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var detailsGridLayout: View
     private lateinit var networkAdapter: NetworkAdapter
     private lateinit var scanButton: ImageButton
+    private lateinit var muteButton: ImageButton
 
     private val availableNetworks = mutableListOf<ScanResult>()
 
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     // Tone feedback: a rising/falling chirp when RSSI moves beyond a threshold
     private var toneEnabled = true
-    private var toneThresholdDb = 5
+    private var toneThresholdDb = 2
     private var lastToneReading: Float? = null
     private var lastToneTimeMs = 0L
     private val toneFeedback by lazy { ToneFeedback() }
@@ -96,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         networkRecyclerView = findViewById(R.id.networkRecyclerView)
         settingsButton = findViewById(R.id.settingsButton)
         scanButton = findViewById(R.id.scanButton)
+        muteButton = findViewById(R.id.muteButton)
         mainContentLayout = findViewById(R.id.mainContentLayout)
         detailsGridLayout = findViewById(R.id.detailsGridLayout)
 
@@ -111,6 +113,9 @@ class MainActivity : AppCompatActivity() {
         }
         settingsButton.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
+        }
+        muteButton.setOnClickListener {
+            toggleTone()
         }
 
         checkPermissions()
@@ -175,9 +180,24 @@ class MainActivity : AppCompatActivity() {
         scanIntervalMs = prefs.getInt("scanFrequency", 5).coerceAtLeast(1) * 1000L
         dbiCalibration = prefs.getInt("dbiCalibration", 0)
         toneEnabled = prefs.getBoolean("toneFeedbackEnabled", true)
-        toneThresholdDb = prefs.getInt("toneThresholdDb", 5).coerceAtLeast(1)
+        toneThresholdDb = prefs.getInt("toneThresholdDb", 2).coerceAtLeast(1)
         // Reset the baseline so returning from Settings can't fire a stale cue
         lastToneReading = null
+        updateMuteIcon()
+    }
+
+    /** Flip tone feedback from the main page and persist it. */
+    private fun toggleTone() {
+        toneEnabled = !toneEnabled
+        prefs.edit().putBoolean("toneFeedbackEnabled", toneEnabled).apply()
+        updateMuteIcon()
+    }
+
+    private fun updateMuteIcon() {
+        muteButton.setImageResource(
+            if (toneEnabled) R.drawable.ic_volume_up_24dp
+            else R.drawable.ic_volume_off_24dp
+        )
     }
 
     /**
@@ -399,6 +419,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST = 1001
-        private const val MIN_TONE_GAP_MS = 1200L
+        private const val MIN_TONE_GAP_MS = 600L
     }
 }

@@ -22,9 +22,11 @@ AP actually reachable, and how strong?" without dragging a laptop around.
 - **Signal graph** — rolling visualisation of signal strength over time
   (`SignalGraphView`)
 - **Per-network detail** — tap a network for its reading
-- **Tone feedback** — a rising chirp when the monitored signal improves and a
-  falling chirp when it weakens, triggered once RSSI moves past a configurable
-  threshold (dB, default 5). Off-switchable in Settings.
+- **Tone feedback** — a sharp rising click when the monitored signal improves
+  and a falling click when it weakens, triggered once RSSI moves past a
+  configurable threshold (dB, default 2). Sharp transients, not whoops, so the
+  cue reads eyes-free. A mute toggle on the main page flips it instantly;
+  Settings carries the threshold and a persisted on/off.
 - **Settings** — configurable scan behaviour, calibration offset, tone feedback
 
 ## Requirements & Permissions

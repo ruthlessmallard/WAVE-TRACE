@@ -39,7 +39,7 @@ class SettingsActivity : AppCompatActivity() {
         val scanFrequency = sharedPrefs.getInt("scanFrequency", 5) // Default to 5 seconds
         val dbiCalibration = sharedPrefs.getInt("dbiCalibration", 0) // Default to 0
         val toneEnabled = sharedPrefs.getBoolean("toneFeedbackEnabled", true)
-        val toneThreshold = sharedPrefs.getInt("toneThresholdDb", 5)
+        val toneThreshold = sharedPrefs.getInt("toneThresholdDb", 2)
 
         scanFrequencyEditText.setText(scanFrequency.toString())
         dbiCalibrationEditText.setText(dbiCalibration.toString())
